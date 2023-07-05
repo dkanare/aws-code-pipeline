@@ -1,13 +1,16 @@
-FROM golang:1.12-alpine AS build
-#Install git
-RUN apk add --no-cache git
-#Get the hello world package from a GitHub repository
-RUN go get github.com/golang/example/hello
-WORKDIR /go/src/github.com/golang/example/hello
-# Build the project and send the output to /bin/HelloWorld 
-RUN go build -o /bin/HelloWorld
+#FROM node:14.15.0 as builder
+FROM public.ecr.aws/docker/library/node:14.21.3-alpine as builder
+WORKDIR /app
+COPY ./package.json ./
+RUN npm install --silent
+RUN npm install -g @angular/cli
+COPY . ./
+RUN npm run build
+#CMD ["npm", "start"]
 
-FROM golang:1.12-alpine
-#Copy the build's output binary from the previous build container
-COPY --from=build /bin/HelloWorld /bin/HelloWorld
-ENTRYPOINT ["/bin/HelloWorld"]
+## frontend
+#FROM nginx:latest
+FROM public.ecr.aws/docker/library/nginx:1.25
+EXPOSE 3000
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/dist /usr/share/nginx/html
