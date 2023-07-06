@@ -8,7 +8,7 @@ phases:
 #      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
       - docker login -u AWS -p $(aws ecr get-login-password) https://$(aws sts get-caller-identity --query 'Account' --output text).dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
 
-      - REPOSITORY_URI=982455985978.dkr.ecr.ap-south-1.amazonaws.com/upload-document
+      - REPOSITORY_URI=<<YOUR-REPO-URI>>
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
   build:
